@@ -8,7 +8,7 @@ setup(
     description='Yang Kit Package',
     author='Jhansi',
     author_email='jhanm@cisco.com',
-    url='https://wwwin-github.cisco.com/cafy/yangkit',
+    url='https://github.com/yang-infra/yangkit',
     packages=find_packages()
 )
 
