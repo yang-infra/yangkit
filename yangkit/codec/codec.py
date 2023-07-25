@@ -84,8 +84,7 @@ class Codec(object):
         payload = decoder.data_in_rpc_reply(payload)
 
         if is_action_response:
-            decoder.decode_action_response(payload, model.output.data)
-            return model
+            return decoder.decode_action_response(payload, model)
 
         return decoder.decode(payload, model)
 

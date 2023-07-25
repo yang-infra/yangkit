@@ -2,7 +2,7 @@ from lxml import etree
 from yangkit.types import YList
 from yangkit.utilities.logger import log
 from yangkit.types import Entity
-from yangkit.utilities.entity import get_internal_node, get_top_level_class
+from yangkit.utilities.entity import get_internal_node, get_top_level_class, get_bundle_name, get_bundle_yang_ns, path_in_namespace_lookup
 from yangkit.errors import YCodecError
 
 
@@ -37,9 +37,12 @@ class XmlDecoder(object):
             log.debug("payload is empty")
 
         # fetching internal node from top_entity with path equivalent to model's absolute_path
-        internal_node = get_internal_node(top_entity, model.get_absolute_path())
-        if isinstance(internal_node, YList):
-            return internal_node.entities()
+        if not isinstance(model, Entity):
+            log.error("Argument 'model' should be an Entity object")
+            raise YCodecError("Argument 'model' should be an Entity object")
+        else:
+            internal_node = get_internal_node(top_entity, model.get_absolute_path())
+
         return internal_node
 
     @staticmethod
@@ -51,18 +54,30 @@ class XmlDecoder(object):
         :param model: An instance of yangkit.types.Entity which contains decoded information
         """
 
+        if not hasattr(model, "output"):
+            log.debug(f"model {model} has no attribute output")
+            return
+
         if not payload:
             log.debug("payload is empty")
             return
 
         payload_tree = etree.fromstring(payload.encode('utf-8'))
-        root = payload_tree.getroottree().getroot()
+        data = payload_tree.getroottree().getroot()
+
+        bundle_yang_ns = get_bundle_yang_ns(get_bundle_name(model))
+        nsmap = path_in_namespace_lookup(model.get_segment_path(), bundle_yang_ns)
+        output = etree.Element("output", nsmap=nsmap)
+        output.append(data)
+
         try:
-            XmlDecoder._decode_helper(root, model)
+            XmlDecoder._decode_helper(output, model.output)
         except Exception as error:
             error.payload = payload
             log.error(error)
             raise YCodecError(error)
+
+        return model
 
     @staticmethod
     def _decode_helper(root, entity):
@@ -72,24 +87,31 @@ class XmlDecoder(object):
         :param root: root of the element tree
         :param entity: Enitity object
         """
-        if not root:
+        if root is None:
             return
+
+        qual_root = etree.QName(root)
+        root_namespace = qual_root.namespace
+        bundle_yang_ns = get_bundle_yang_ns(get_bundle_name(entity))
 
         for child_node in root.getchildren():
             # separate element namespace and tag
             qual_node = etree.QName(child_node)
-            yname = qual_node.localname
+            namespace, yname = qual_node.namespace, qual_node.localname
 
+            if namespace != root_namespace:
+                for name_space_prefix, name_space in bundle_yang_ns.NAMESPACE_LOOKUP.items():
+                    if name_space == namespace:
+                        yname = f"{name_space_prefix}:{yname}"
+                        break
+            
             entity.set_value(yname, child_node.text)
 
             attr, child = entity.get_child_by_name(yname, "")
             if attr and child:
-                if isinstance(child, YList):
-                    ylist_item = child.pop()
-                    if hasattr(ylist_item, attr):
-                        setattr(ylist_item, attr, child_node.text)
-                    child.append(ylist_item)
-                    XmlDecoder._decode_helper(child_node, ylist_item)
+                if isinstance(getattr(entity, attr), YList):
+                    XmlDecoder._decode_helper(child_node, child)
+                    getattr(entity, attr).append(child)
                 elif isinstance(child, Entity):
                     XmlDecoder._decode_helper(child_node, child)
 

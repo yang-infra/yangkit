@@ -3,7 +3,7 @@ import uuid
 from lxml import etree
 from yangkit.types import Entity, YList
 from yangkit.filters import YFilter
-from yangkit.utilities.entity import get_bundle_name, get_bundle_yang_ns, get_top_level_class
+from yangkit.utilities.entity import get_bundle_name, get_bundle_yang_ns, get_top_level_class, path_in_namespace_lookup
 
 NETCONF_NS = 'urn:ietf:params:xml:ns:netconf:base:1.0'
 
@@ -33,7 +33,7 @@ class XmlEncoder(object):
                 preamble = XmlEncoder._encode_ancestors(entity.parent, root, optype, 
                                                         entity.has_list_ancestor)
 
-        is_filter = (optype == 'read')
+        is_filter = (optype == 'read' or optype == 'action')
 
         if isinstance(entity, YList):
             for item in entity:
@@ -74,7 +74,7 @@ class XmlEncoder(object):
 
         top_entity = get_top_level_class(entity)
 
-        nsmap = XmlEncoder._get_nsmap(top_entity.get_segment_path(), bundle_yang_ns)
+        nsmap = path_in_namespace_lookup(top_entity.get_segment_path(), bundle_yang_ns)
         root = etree.SubElement(root, top_entity.yang_name, nsmap=nsmap)
 
         elem = root
@@ -85,12 +85,9 @@ class XmlEncoder(object):
             else:
                 _, child = curr_entity.get_child_by_name(segment, segment)
 
-            if isinstance(child, YList):
-                curr_entity = child.pop()
-            elif isinstance(child, Entity):
-                curr_entity = child
+            curr_entity = child
 
-            nsmap = XmlEncoder._get_nsmap(curr_entity.get_segment_path(), bundle_yang_ns)
+            nsmap = path_in_namespace_lookup(curr_entity.get_segment_path(), bundle_yang_ns)
             elem = etree.SubElement(elem, curr_entity.yang_name, nsmap=nsmap)
 
         return elem
@@ -108,10 +105,10 @@ class XmlEncoder(object):
         if not entity.parent:
             p_elem = XmlEncoder._create_preamble(entity, root)
         else:
-            p_elem = XmlEncoder._encode_ancestors(entity.parent, root, entity.has_list_ancestor)
+            p_elem = XmlEncoder._encode_ancestors(entity.parent, root, optype, entity.has_list_ancestor)
 
         bundle_yang_ns = get_bundle_yang_ns(get_bundle_name(entity))
-        nsmap = XmlEncoder._get_nsmap(entity.get_segment_path(), bundle_yang_ns)
+        nsmap = path_in_namespace_lookup(entity.get_segment_path(), bundle_yang_ns)
         elem = etree.SubElement(p_elem, entity.yang_name, nsmap=nsmap)
 
         if has_list_ancestor:
@@ -125,7 +122,7 @@ class XmlEncoder(object):
                     elem.text = leaf_value
                     continue
 
-                nsmap = XmlEncoder._get_nsmap(leaf_name, bundle_yang_ns)
+                nsmap = path_in_namespace_lookup(leaf_name, bundle_yang_ns)
                 if nsmap:
                     leaf_name = leaf_name.split(':')[1]
                 name_space, name_space_prefix = name_value[1].name_space, name_value[1].name_space_prefix
@@ -161,7 +158,7 @@ class XmlEncoder(object):
             return
 
         bundle_yang_ns = get_bundle_yang_ns(get_bundle_name(entity))
-        nsmap = XmlEncoder._get_nsmap(entity.get_segment_path(), bundle_yang_ns)
+        nsmap = path_in_namespace_lookup(entity.get_segment_path(), bundle_yang_ns)
         elem = etree.SubElement(root, entity.yang_name, nsmap=nsmap)
 
         # xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0" nc:operation="replace"
@@ -178,7 +175,7 @@ class XmlEncoder(object):
                 elem.text = leaf_value
                 continue
 
-            nsmap = XmlEncoder._get_nsmap(leaf_name, bundle_yang_ns)
+            nsmap = path_in_namespace_lookup(leaf_name, bundle_yang_ns)
             if nsmap:
                 leaf_name = leaf_name.split(':')[1]
             name_space, name_space_prefix = name_value[1].name_space, name_value[1].name_space_prefix
@@ -199,30 +196,13 @@ class XmlEncoder(object):
             XmlEncoder._encode_helper(child, elem, optype)
 
     @staticmethod
-    def _get_nsmap(segment_path, bundle_yang_ns):
-        """
-        Checks if the prefix of a container or leaf is in the bundle's YANG namespace lookup
-
-        :param segment_path: segment_path of a container or name of a leaf
-        :param bundle_yang_ns: YANG namespace module for the bundle
-        :return {None: name_space} if prefix is present in the namespace_lookup; {} otherwise
-        """
-        segments = re.split(r":(?![^\[]*\])", segment_path)
-        if len(segments) == 2:
-            prefix, _ = segments
-            for name_space_prefix, name_space in bundle_yang_ns.NAMESPACE_LOOKUP.items():
-                if prefix == name_space_prefix:
-                    return {None: name_space}
-        return {}
-
-    @staticmethod
     def _remove_input_node_in_action_rpc(root):
         """
         In case of encoding action models, removes the input node and appends the input data to root node
         """
         if len(root) and root[0].tag == 'input':
             input_node = root[0]
-            root.append(input_node[0])
+            root.extend(input_node.getchildren())
             root.remove(input_node)
 
     @staticmethod
