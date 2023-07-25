@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 
 HERE = path.abspath(path.dirname(__file__))
 
-INSTALL_REQUIREMENTS = ['yangkit>=$CORE_VERSION$']
+INSTALL_REQUIREMENTS = ['yangkit==$CORE_VERSION$']
 
 NMSP_PKG_NAME = "$PACKAGE$"
 NMSP_PKG_VERSION = "$VERSION$"
@@ -30,8 +30,8 @@ setup(
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     url='https://github.com/CiscoDevNet/ydk-py',
-    author='Cisco Systems',
-    author_email='yang-dk@cisco.com',
+    author='Cafy',
+    author_email='cafy-support@cisco.com',
     license='Apache 2.0',
     classifiers=[
         'Development Status :: 3 - Alpha',
@@ -48,10 +48,9 @@ setup(
         'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: C++'
+        'Programming Language :: Python :: 3.5'
     ],
-    keywords='yang, C++11,  python bindings',
+    keywords='yang, python bindings',
     packages=YANGKIT_PACKAGES,
     namespace_packages=NMSP_PACKAGES,
     install_requires=INSTALL_REQUIREMENTS,

@@ -1,4 +1,4 @@
-from yangkit import log
+from yangkit.utilities.logger import log
 from yangkit.types import Entity, YList
 from yangkit.errors import YInvalidArgumentError, YCodecError
 from .xml_encoder import XmlEncoder
