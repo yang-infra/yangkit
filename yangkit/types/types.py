@@ -524,10 +524,8 @@ class Entity:
             if not is_list:
                 self._children_name_map[attr] = child_yang_name
                 setattr(self, attr, child)
-            else:
-                getattr(self, attr).append(child)
 
-            return attr, getattr(self, attr)
+            return attr, child
 
         return None, None
 

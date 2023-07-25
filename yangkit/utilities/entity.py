@@ -21,7 +21,6 @@ def get_internal_node(entity, absolute_path):
         log.error(err_msg)
         raise YInvalidArgumentError(err_msg)
 
-    absolute_path = re.sub(r"\[(.*?)='None'\]", "", absolute_path)
     segments = re.split(r"/(?![^\[]*\])", absolute_path)
 
     if segments[0] != top_absolute_path:
@@ -31,11 +30,21 @@ def get_internal_node(entity, absolute_path):
 
     for segment in segments[1:]:
         if '[' in segment:
-            _, entity = entity.get_child_by_name(segment.split('[')[0], "")
-            for ent in entity:
-                if ent.get_segment_path() == segment:
-                    entity = ent
+            attr, child = entity.get_child_by_name(segment.split('[')[0], "")
+            ylist = getattr(entity, attr)
+
+            found = False
+            for ylist_item in ylist:
+                if ylist_item.ylist_key_names and ylist_item.get_segment_path() == segment:
+                    found = True
                     break
+            if found:
+                entity = ylist_item
+            elif segment == segments[-1]:
+                # fair assumption
+                return ylist.entities()
+            else:
+                entity = child
         else:
             _, entity = entity.get_child_by_name(segment, segment)
 
@@ -86,3 +95,20 @@ def get_top_level_class(entity):
     clazz = getattr(importlib.import_module(
         f'yangkit.models.{bundle_name}.{module_name}'), clazz_name)
     return clazz()
+
+
+def path_in_namespace_lookup(segment_path, bundle_yang_ns):
+    """
+    Checks if the prefix of a container or leaf is in the bundle's YANG namespace lookup
+
+    :param segment_path: segment_path of a container or name of a leaf
+    :param bundle_yang_ns: YANG namespace module for the bundle
+    :return {None: name_space} if prefix is present in the namespace_lookup; {} otherwise
+    """
+    segments = re.split(r":(?![^\[]*\])", segment_path)
+    if len(segments) == 2:
+        prefix, _ = segments
+        for name_space_prefix, name_space in bundle_yang_ns.NAMESPACE_LOOKUP.items():
+            if prefix == name_space_prefix:
+                return {None: name_space}
+    return {}
