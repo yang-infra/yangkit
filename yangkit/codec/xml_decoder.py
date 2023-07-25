@@ -1,6 +1,6 @@
 from lxml import etree
 from yangkit.types import YList
-from yangkit import log
+from yangkit.utilities.logger import log
 from yangkit.types import Entity
 from yangkit.utilities.entity import get_internal_node, get_top_level_class
 from yangkit.errors import YCodecError

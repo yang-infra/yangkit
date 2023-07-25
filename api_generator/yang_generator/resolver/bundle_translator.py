@@ -15,7 +15,7 @@ from shutil import rmtree
 from collections import namedtuple
 from jinja2 import Environment
 from ..common import YangkitGenException
-
+from yangkit.__version__ import __version__
 
 logger = logging.getLogger('yangkitgen')
 
@@ -146,7 +146,7 @@ def translate(in_file, out_file):
     try:
         name = data['name']
         version = data['version']
-        core_version = data['core_version']
+        core_version = __version__
     except KeyError:
         raise YangkitGenException('Bundle profile requires to specify name, version, core_version and description.')
 

@@ -1,6 +1,6 @@
 import re
 import importlib
-from yangkit import log
+from yangkit.utilities.logger import log
 from yangkit.errors import YInvalidArgumentError
 
 

@@ -100,13 +100,11 @@ class DocPrinter(object):
         self.ctx.lvl_dec()
 
     def _print_class_rst(self, clazz):
-        self._print_namespace(clazz)
         self._print_header(clazz)
         # Body
         self.ctx.lvl_inc()
-        if self.lang != 'go':
-            self._print_bases(clazz)
-            self._print_class_hierarchy(clazz)
+        self._print_bases(clazz)
+        self._print_class_hierarchy(clazz)
         if clazz.stmt.search_one('presence') is not None:
             self._append('This class is a :ref:`presence class<presence-class>`\n')
         if clazz.stmt.keyword != 'rpc':
@@ -123,7 +121,6 @@ class DocPrinter(object):
         self.ctx.lvl_dec()
 
     def _print_enum_rst(self, enumz):
-        self._print_namespace(enumz)
         self._print_header(enumz)
         # Body
         self.ctx.lvl_inc()
@@ -145,19 +142,8 @@ class DocPrinter(object):
         import_stmt = None
         if isinstance(named_element, Package) and named_element.stmt.keyword == 'module':
             template = '%s module'
-            if self.lang == 'go':
-                template = 'package %s'
-                import_stmt = 'import "github.com/CiscoDevNet/ydk-go/ydk/models/%s/%s"\n' % (
-                    self.bundle_name, named_element.name)
             title = template % title
         self._print_title(title)
-
-        if import_stmt is not None and self.lang == 'go':
-            self._append('\n')
-            self._append('.. code-block:: sh\n')
-            self.ctx.lvl_inc()
-            self._append(import_stmt)
-            self.ctx.lvl_dec()
 
         # TOC Tree
         if not isinstance(named_element, Enum):
@@ -194,10 +180,8 @@ class DocPrinter(object):
 
     def _get_toctree_section_title(self, base):
         result = ''
-        if self.lang in ('py', 'cpp'):
+        if self.lang == 'py':
             result = '%s Classes' % base
-        elif self.lang == 'go':
-            result = '%s Structs' % base
         else:
             raise Exception('Language {0} not yet supported'.format(self.lang))
 
@@ -271,10 +255,6 @@ class DocPrinter(object):
 
         else:
             self._print_toctree_section(elements, '')
-
-    def _print_namespace(self, clazz):
-        if self.lang == 'cpp':
-            self._append('\n.. cpp:namespace:: {0}\n'.format(clazz.get_package().name))
 
     def _print_bases(self, clazz):
         bases = get_class_bases(clazz, self.lang)
