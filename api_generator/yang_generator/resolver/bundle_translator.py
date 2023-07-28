@@ -15,7 +15,6 @@ from shutil import rmtree
 from collections import namedtuple
 from jinja2 import Environment
 from ..common import YangkitGenException
-from yangkit.__version__ import __version__
 
 logger = logging.getLogger('yangkitgen')
 
@@ -132,6 +131,22 @@ def load_profile_attr(profile_file, attr):
     else:
         return None
 
+def get_version():
+    current_path = os.path.dirname(os.path.abspath(__file__))
+    api_directory = os.path.abspath(os.path.join(current_path, '..', '..', '..'))
+    yangkit_directory = os.path.join(api_directory, 'yangkit')
+    version_file = os.path.join(yangkit_directory, '__version__.py')
+    with open(version_file, 'r') as file:
+        version_code = file.read()
+
+    version_pattern = r'__version__\s*=\s*["\']([^"\']+)["\']'
+    version_match = re.search(version_pattern, version_code)
+
+    if version_match:
+        version = version_match.group(1)
+        return version
+    else:
+        raise ValueError("Version not found in '__version__.py' file.")
 
 def translate(in_file, out_file):
     """ Generate bundle file using profile file(in_file).
@@ -146,7 +161,7 @@ def translate(in_file, out_file):
     try:
         name = data['name']
         version = data['version']
-        core_version = __version__
+        core_version = get_version()
     except KeyError:
         raise YangkitGenException('Bundle profile requires to specify name, version, core_version and description.')
 
