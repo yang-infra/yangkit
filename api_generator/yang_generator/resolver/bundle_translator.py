@@ -142,11 +142,11 @@ def get_version():
     version_pattern = r'__version__\s*=\s*["\']([^"\']+)["\']'
     version_match = re.search(version_pattern, version_code)
 
-    if version_match:
-        version = version_match.group(1)
-        return version
-    else:
+    if not version_match:
         raise ValueError("Version not found in '__version__.py' file.")
+    
+    version = version_match.group(1)
+    return version        
 
 def translate(in_file, out_file):
     """ Generate bundle file using profile file(in_file).
@@ -162,6 +162,7 @@ def translate(in_file, out_file):
         name = data['name']
         version = data['version']
         core_version = get_version()
+        print(core_version)
     except KeyError:
         raise YangkitGenException('Bundle profile requires to specify name, version, core_version and description.')
 
