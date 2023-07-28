@@ -162,7 +162,6 @@ def translate(in_file, out_file):
         name = data['name']
         version = data['version']
         core_version = get_version()
-        print(core_version)
     except KeyError:
         raise YangkitGenException('Bundle profile requires to specify name, version, core_version and description.')
 
