@@ -1,6 +1,6 @@
 ### Credits
 
-This project incorporates code from the YDK-GEN Repository (https://github.com/CiscoDevNet/ydk-gen/tree/0.8.6.4), developed and maintained by the YDK Team.
+This project incorporates code from the [YDK-GEN Repository](https://github.com/CiscoDevNet/ydk-gen/tree/0.8.6.4), developed and maintained by the YDK Team.
 
 We extend our sincere appreciation to the YDK Team for their exceptional work on the YDK Project. Their dedication and expertise have significantly enriched our project.
 
@@ -14,7 +14,7 @@ The Yangkit is a software development tool, which provides API for building appl
 
 ### Utilized Components
 
-1. Model API Generator : This component generates Python API Package for given Yang Models. The generated package is a PIP Installable tar file. Refer to https://github.com/yang-infra/yangkit/tree/main
+1. Model API Generator : This component generates Python API Package for given Yang Models. The generated package is a PIP Installable tar file. Refer to [Steps to Generate Model Tar File](https://github.com/yang-infra/yangkit/tree/Jhanm-Fix#steps-to-generate-model-tar-file)
 2. Codec: This component translates Python API Objects to XML and vice-versa.
 
 ### Steps to Generate Model Tar File
@@ -43,7 +43,7 @@ Copy all the yang models you want to generate APIs for into a folder and compile
 cd <yang-files-dir>
 pyang *.yang   
 ```
-Note: Refer [Pyang Errors Resolution](https://github.com/yang-infra/yangkit/tree/main#pyang-related-errors-resolution) if you face any Pyang related issue.
+Note: Refer [Pyang Errors Resolution](https://github.com/yang-infra/yangkit/tree/main#pyang-related-errors-resolution) if you face any pyang related issue.
 
 4) Create a bundle file: Example : /ws/jhanm-sjc/yang-kit/bundle.json
 ```
