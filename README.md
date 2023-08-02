@@ -14,7 +14,7 @@ The Yangkit is a software development tool, which provides API for building appl
 
 ### Utilized Components
 
-1. Model API Generator : This component generates Python API Package for given Yang Models. The generated package is a PIP Installable tar file. Refer to [Steps to Generate Model Tar File](https://github.com/yang-infra/yangkit/tree/Jhanm-Fix#steps-to-generate-model-tar-file)
+1. Model API Generator : This component generates Python API Package for given Yang Models. The generated package is a PIP Installable tar file. Refer to [Steps to Generate Model Tar File](https://github.com/yang-infra/yangkit#steps-to-generate-model-tar-file)
 2. Codec: This component translates Python API Objects to XML and vice-versa.
 
 ### Steps to Generate Model Tar File
