@@ -1,26 +1,25 @@
 ### Credits
 
-This project incorporates code from the YDK-GEN Repository (https://github.com/CiscoDevNet/ydk-gen/tree/0.8.6.4), developed and maintained by the YDK-GEN Team.
+This project incorporates code from the YDK-GEN Repository (https://github.com/CiscoDevNet/ydk-gen/tree/0.8.6.4), developed and maintained by the YDK Team.
 
-We extend our sincere appreciation to the YDK-GEN Team for their exceptional work on the YDK-GEN Project. Their dedication and expertise have significantly enriched our project.
+We extend our sincere appreciation to the YDK Team for their exceptional work on the YDK Project. Their dedication and expertise have significantly enriched our project.
 
-We would also like to express our gratitude to the broader community of contributors who have contributed to the YDK-GEN Repository. Their collaborative efforts have made the repository an invaluable resource for developers.
+We would also like to express our gratitude to the broader community of contributors who have contributed to the YDK Repository. Their collaborative efforts have made the repository an invaluable resource for developers.
 
-Please note that the YDK-GEN Repository is governed by its own license, which you can find in their repository. We recommend reviewing their licensing terms to ensure compliance with the applicable licenses.
+Please note that the YDK Repository is governed by its own license, which you can find in their repository. We recommend reviewing their licensing terms to ensure compliance with the applicable licenses.
 
-### YANGKIT Repository Description
+### Yangkit Repository Description
 
-The YANGKIT is a software development tool, which provides API for building applications based on YANG models. The YANGKIT allows generate YANG model API and provides services to apply generated API over various communication protocols.
+The Yangkit is a software development tool, which provides API for building applications based on YANG models. It generates YANG Model APIs and provides services to apply API Obejcts over various communication protocols.
 
 ### Utilized Components
 
-1. Model API Generator : This YANGKIT component provides a module bundle, consisting of python programming language APIs derived from YANG models. Each module bundle is generated using a bundle profile. Developers can either use pre-packaged generated bundles, or define their own bundle, consisting of a set of YANG models, using a bundle profile. This gives the developer an ability to customize scope of their bundle based on their requirements. We made specific modifications to meet our project's requirements - Removed CPP & GO Model API Generation Support; Simplified the Python Model API Generator Code Base.
+1. Model API Generator : This component generates Python API Package for given Yang Models. The generated package is a PIP Installable tar file. Refer to https://github.com/yang-infra/yangkit/tree/main
+2. Codec: This component translates Python API Objects to XML and vice-versa.
 
 ### Steps to Generate Model Tar File
  
 1) Clone the yangkit Github
-
-git clone https://github.com/yang-infra/yangkit.git
  
 2) Build and source a virtual environment 
 ```
@@ -38,25 +37,13 @@ pip install -r api_generator/requirements.txt
  
 3) Add and validate yang models 
 
-Get a local copy of the yang models from catchyang repository and compile them using 'pyang' to ensure the validity of the models. 
- 
-Example: If you want to create bundle tar file for - PROD_BUILD_7_11_1_12I_DT_IMAGE 
+Copy all the yang models you want to generate APIs for into a folder and compile them using 'pyang' to ensure the validity of the models. 
 
-Catchyang location (Has all the .yang files): /auto/xmpi/xr-yang/schemas/catchyang/ 
- 
-Commands: 
- ```
-cp /auto/xmpi/xr-yang/schemas/catchyang/PROD_BUILD_7_11_1_12I_DT_IMAGE/consolidated/*.yang <yang-files-dir>
+```
 cd <yang-files-dir>
 pyang *.yang   
- ```
-Example: 
- ```
-cp /auto/xmpi/xr-yang/schemas/catchyang/PROD_BUILD_7_11_1_12I_DT_IMAGE/consolidated/*.yang /ws/jhanm-sjc/yang-files 
-cd /ws/jhanm-sjc/yang-files
-pyang *.yang 
-``` 
-(Refer to the Note Section at the end of this Readme Doc – If you face any Pyang Related Issues.) 
+```
+Note: Refer [Pyang Errors Resolution](https://github.com/yang-infra/yangkit/tree/main#pyang-related-errors-resolution) if you face any Pyang related issue.
 
 4) Create a bundle file: Example : /ws/jhanm-sjc/yang-kit/bundle.json
 ```
@@ -79,9 +66,10 @@ To Run the Script :
 - bundle (Input Bundle File)
 - output-directory (User directory where the .tar file are gonna get generated)
 
+```
  cd <yangkit Folder Path>
 ./generate.py --bundle <Bundle Json File> --output-directory <Output Directory> -v
- 
+```
 
 6) Genetated .tar file will be present in the output directory.
 
@@ -111,14 +99,14 @@ total 38804
 (yangkit_venv) [jhanm@sjc-ads-1025 generated_models]$ 
 ```
 
-### Some Pyang Related Errors Resolution
+### Pyang Related Errors Resolution
 
-1) Delete such files with this error
+1) Remove such files with this error. This means the yang file is empty.
 ```
 Cisco-IOS-XR-sysadmin-eobc-iosxrwbd.yang:0: error: premature end of file
 ```
 
-2) Removed deviation files with pyang error
+2) Remove oc-deviation files with pyang error.
 ```
 (yangkit_venv) [jhanm@sjc-ads-1025 PROD_BUILD_7_11_1_19I_DT_IMAGE]$ rm -rf cisco-xr-openconfig-optical-amplifier-sirius-deviations.yang
 (yangkit_venv) [jhanm@sjc-ads-1025 PROD_BUILD_7_11_1_19I_DT_IMAGE]$ rm -rf cisco-xr-openconfig-platform-deviations-spi.yang
@@ -127,14 +115,14 @@ Cisco-IOS-XR-sysadmin-eobc-iosxrwbd.yang:0: error: premature end of file
 (yangkit_venv) [jhanm@sjc-ads-1025 PROD_BUILD_7_11_1_19I_DT_IMAGE]$ rm -rf cisco-xr-openconfig-platform-transceiver-deviations.yang
 ```
 
-3) Delete these files with such errors
+3) Fix/remove yang files with unresolved references.
 ```
 Cisco-IOS-XR-sysadmin-controllers-iosxrwbd.yang:20: error: module "Cisco-IOS-XR-sysadmin-eobc-iosxrwbd" not found in search path
 
 (yangkit_venv) [jhanm@sjc-ads-1025 PROD_BUILD_7_11_1_19I_DT_IMAGE]$ rm -rf Cisco-IOS-XR-sysadmin-controllers-iosxrwbd.yang
 ```
 
-4) Delete the .yang files with similar errors
+4) Fix/remove yang files with similar errors.
 ```
 openconfig-optical-attenuator.yang:15: error: module "oc-xr-mapping" not found in search path
 ```
