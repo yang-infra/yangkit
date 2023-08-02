@@ -275,11 +275,11 @@ class DocPrinter(object):
             parent_list.append(parent)
             parent = parent.owner
 
-        clazz_hierarchy = ['Class Hierarchy \:']
+        clazz_hierarchy = ['Class Hierarchy :']
         if len(parent_list) > 0:
             for parent in reversed(parent_list):
                 if not clazz_hierarchy[0][-1:] == ':':
-                    clazz_hierarchy.append(' \>')
+                    clazz_hierarchy.append(' >')
 
                 tag = get_class_crossref_tag(parent.name, parent, self.lang)
                 clazz_hierarchy.append(tag)
