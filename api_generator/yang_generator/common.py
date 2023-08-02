@@ -165,11 +165,6 @@ def convert_to_reStructuredText(yang_text):
     reSt = yang_text
     if reSt is not None and len(reSt) > 0:
         reSt = yang_text.replace('\\', '\\\\')
-        reSt = reSt.replace(':', '\:')
-        reSt = reSt.replace('_', '\_')
-        reSt = reSt.replace('-', '\-')
-        reSt = reSt.replace('*', '\*')
-        reSt = reSt.replace('|', '\|')
     return reSt
 
 def is_config_stmt(stmt):
