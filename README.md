@@ -8,6 +8,8 @@ We would also like to express our gratitude to the broader community of contribu
 
 Please note that the YDK Repository is governed by its own license, which you can find in their repository. We recommend reviewing their licensing terms to ensure compliance with the applicable licenses.
 
+</br>
+
 ### Yangkit Repository Description
 
 The Yangkit is a software development tool, which provides API for building applications based on YANG models. It generates YANG Model APIs and provides services to apply API Obejcts over various communication protocols.
@@ -16,6 +18,19 @@ The Yangkit is a software development tool, which provides API for building appl
 
 1. Model API Generator : This component generates Python API Package for given Yang Models. The generated package is a PIP Installable tar file. Refer to [Steps to Generate Model API Python package](https://github.com/yang-infra/yangkit#steps-to-generate-model-api-python-package)
 2. Codec: This component translates Python API Objects to XML and vice-versa.
+
+<br>
+
+### How to use
+1. Create a Model API Package. Refer to [Steps to Generate Model API Python package](https://github.com/yang-infra/yangkit#steps-to-generate-model-api-python-package)
+2. Install yangkit and the generated Model API Package in your python env using pip
+```
+pip install git+https://github.com/yang-infra/yangkit
+pip install /auto/cafy/yang/models/7_11_1_19I/yangkit-models-cisco-ios-xr-7.11.1.tar.gz
+```
+3. Refer to [examples](https://github.com/yang-infra/yangkit/tree/main/examples) for code examples
+
+<br>
 
 ### Steps to Generate Model API Python package
  
