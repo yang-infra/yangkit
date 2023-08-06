@@ -8,16 +8,31 @@ We would also like to express our gratitude to the broader community of contribu
 
 Please note that the YDK Repository is governed by its own license, which you can find in their repository. We recommend reviewing their licensing terms to ensure compliance with the applicable licenses.
 
+</br>
+
 ### Yangkit Repository Description
 
 The Yangkit is a software development tool, which provides API for building applications based on YANG models. It generates YANG Model APIs and provides services to apply API Obejcts over various communication protocols.
 
 ### Utilized Components
 
-1. Model API Generator : This component generates Python API Package for given Yang Models. The generated package is a PIP Installable tar file. Refer to [Steps to Generate Model Tar File](https://github.com/yang-infra/yangkit#steps-to-generate-model-tar-file)
+1. Model API Generator : This component generates Python API Package for given Yang Models. The generated package is a PIP Installable tar file. Refer to [Steps to Generate Model API Python package](https://github.com/yang-infra/yangkit#steps-to-generate-model-api-python-package)
 2. Codec: This component translates Python API Objects to XML and vice-versa.
 
-### Steps to Generate Model Tar File
+<br>
+
+### How to use
+1. Create a Model API Package. Refer to [Steps to Generate Model API Python package](https://github.com/yang-infra/yangkit#steps-to-generate-model-api-python-package)
+2. Install yangkit and the generated Model API Package in your python env using pip
+```
+pip install git+https://github.com/yang-infra/yangkit
+pip install /auto/cafy/yang/models/7_11_1_19I/yangkit-models-cisco-ios-xr-7.11.1.tar.gz
+```
+3. Refer to [examples](https://github.com/yang-infra/yangkit/tree/main/examples) for code examples
+
+<br>
+
+### Steps to Generate Model API Python package
  
 1) Clone the yangkit Github
  
@@ -26,13 +41,12 @@ The Yangkit is a software development tool, which provides API for building appl
 cd yangkit
 
 ## Create and activate your virtual environment 
-python3 -m venv yang_venv 
-source yang_venv/bin/activate 
+python3 -m venv yangkit_venv 
+source yangkit_venv/bin/activate 
  
-## Install python packages 
-## May require additional libraries.  
+## Install Yangkit
 pip install --upgrade pip 
-pip install -r api_generator/requirements.txt
+pip install git+https://github.com/yang-infra/yangkit
 ```
  
 3) Add and validate yang models 
@@ -41,7 +55,7 @@ Copy all the yang models you want to generate APIs for into a folder and compile
 
 ```
 cd <yang-files-dir>
-pyang *.yang   
+pyang *.yang
 ```
 Note: Refer [Pyang Errors Resolution](https://github.com/yang-infra/yangkit/tree/main#pyang-related-errors-resolution) if you face any pyang related issue.
 
@@ -58,7 +72,7 @@ Note: Refer [Pyang Errors Resolution](https://github.com/yang-infra/yangkit/tree
 (yangkit_venv) [jhanm@sjc-ads-1025 yang-kit]$ 
  ```
 
-5) Generate the image using below command 
+5) Generate the Model API python package using below command 
 
 To Run the Script :
 (Set Absolute Path - For Both Bundle File & Output Dir) - Mandatory Parameters
@@ -71,7 +85,7 @@ To Run the Script :
 ./generate.py --bundle <Bundle Json File> --output-directory <Output Directory> -v
 ```
 
-6) Genetated .tar file will be present in the output directory.
+6) Generated .tar file will be present in the output directory. This is a pip installable tar file.
 
 ```
 Writing yangkit-models-cisco-ios-xr-7.11.1/setup.cfg
