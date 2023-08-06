@@ -5,7 +5,7 @@ from yangkit.__version__ import __version__
 INSTALL_REQUIREMENTS = [
     'lxml==3.4.4',
     'pyang==2.5.3',
-    'Jinja2==2.11.3'
+    'Jinja2==3.0.3'
 ]
 
 setup(
