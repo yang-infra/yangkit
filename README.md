@@ -31,7 +31,7 @@ source yangkit_venv/bin/activate
  
 ## Install Yangkit
 pip install --upgrade pip 
-python3 setup.py install 
+pip install git+https://github.com/yang-infra/yangkit
 ```
  
 3) Add and validate yang models 
