@@ -3,6 +3,8 @@ from yangkit.types import Entity, YList
 from yangkit.errors import YInvalidArgumentError, YCodecError
 from .xml_encoder import XmlEncoder
 from .xml_decoder import XmlDecoder
+from .json_encoder import JsonEncoder
+from .json_decoder import JsonDecoder
 
 
 class Codec(object):
@@ -10,7 +12,7 @@ class Codec(object):
     CodecService wrapper.
     """
 
-    SUPPORTED_ENCODING_FORMATS = ["XML"]
+    SUPPORTED_ENCODING_FORMATS = ["XML", "JSON"]
     SUPPORTED_OPERATION_TYPES = ["create", "read", "update", "delete", "action"]
 
     @staticmethod
@@ -38,6 +40,8 @@ class Codec(object):
 
         if encoding == "XML":
             encoder = XmlEncoder
+        elif encoding == "JSON":
+            encoder = JsonEncoder
 
         if isinstance(entity, list):
             ret_encoded_str = ""
@@ -80,6 +84,8 @@ class Codec(object):
 
         if encoding == "XML":
             decoder = XmlDecoder
+        elif encoding == "JSON":
+            decoder = JsonDecoder
 
         payload = decoder.data_in_rpc_reply(payload)
 
