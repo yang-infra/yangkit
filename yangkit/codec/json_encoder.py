@@ -1,10 +1,10 @@
 import re
-import uuid
 import json
-from yangkit.types import Entity, YList
+import logging
 from yangkit.filters import YFilter
-from yangkit.utilities.entity import get_bundle_name, get_bundle_yang_ns, get_top_level_class, find_prefix_in_namespace_lookup
+from yangkit.utilities.entity import get_bundle_name, get_bundle_yang_ns, find_prefix_in_namespace_lookup
 
+log = logging.getLogger("yangkit")
 
 class JsonEncoder(object):
     """
@@ -12,24 +12,59 @@ class JsonEncoder(object):
     """
 
     @staticmethod
-    def encode(entity: Entity, optype):
+    def encode(entity, optype):
         """
         Converts an Entity object to JSON payload
 
         :param entity: Entity Object
         :param optype: Operation type
         """
-        abs_path = entity.get_absolute_path()
-        if not _optype_is_set(optype):
-            # xpath is enough
-            return abs_path
-        else:
-            root = {}
-            JsonEncoder._encode_helper(entity, root, optype)
-            return (abs_path, root)
+
+        if not _is_edit_optype(optype):
+            return JsonEncoder._format_xpath(entity.get_absolute_path())
+
+        original_yfilter = _attach_yfilter(entity, optype)
+        top_entity = JsonEncoder._traverse_to_top_entity(entity)
+
+        root, update_paths, delete_paths = {}, [], []
+        xpath = JsonEncoder._format_xpath(top_entity.get_absolute_path())
+        JsonEncoder._encode_helper(top_entity, root, delete_paths, optype)
+
+        entity.yfilter = original_yfilter
+
+        if root:
+            update_paths.append((xpath, root))
+        return update_paths, delete_paths
 
     @staticmethod
-    def _encode_helper(entity, root, optype, is_filter=False):
+    def encode_list(entities, optype):
+        """
+        Converts an list of Entity objects to JSON payload
+
+        :param entity: Entity Object
+        :param optype: Operation type
+        """
+        update_paths, delete_paths = [], []
+        for entity in entities:
+            update_paths_, delete_paths_ = JsonEncoder.encode(entity, optype)
+            update_paths.extend(update_paths_)
+            delete_paths.extend(delete_paths_)
+
+        return update_paths, delete_paths
+
+    @staticmethod
+    def _traverse_to_top_entity(entity):
+        """
+        Traverse upwards the hierarchy until entity is not a list member
+
+        :param entity: Entity Object
+        """
+        while entity.has_list_ancestor and entity.parent is not None:
+            entity = entity.parent
+        return entity
+
+    @staticmethod
+    def _encode_helper(entity, root, delete_paths, optype):
         """
         Populates the root element by parsing entity in a reccursive manner
 
@@ -38,66 +73,86 @@ class JsonEncoder(object):
         :param optype: Operation type
         :param is_filter: Bool
         """
-        if not is_filter and not entity.has_data():
+        if not entity.has_data():
+            return
+
+        if entity.yfilter == YFilter.delete:
+            delete_paths.append(JsonEncoder._format_xpath(entity.get_absolute_path()))
             return
 
         # creates leaf elements
         for name_value in entity.get_name_leaf_data():
-            # appends leaf json to root
-            JsonEncoder._create_leaf_ele(name_value, root, entity)
+            leaf_name = name_value[0]
+            leaf_data = name_value[1]
+
+            if leaf_data.yfilter == YFilter.delete:
+                delete_paths.append(JsonEncoder._format_xpath(f"{entity.get_absolute_path()}/{leaf_name}"))
+            elif leaf_data.is_set:
+                JsonEncoder._create_leaf_ele(leaf_name, leaf_data, root)
 
         for _, child in entity.get_children().items():
             # appends child json to root
-            child_elem = dict()
-            JsonEncoder._encode_helper(child, child_elem, optype)
+            child_elem = {}
+            JsonEncoder._encode_helper(child, child_elem, delete_paths, optype)
             if child_elem:
+                # add prefix to child name if child's prefix is different from that of parent
+                bundle_yang_ns = get_bundle_yang_ns(get_bundle_name(child))
+                prefix, _ = find_prefix_in_namespace_lookup(child.get_segment_path(), bundle_yang_ns)
+                if prefix:
+                    child_name_with_prefix = f"{prefix}:{child.yang_name}"
+                else:
+                    child_name_with_prefix = child.yang_name
+
                 if hasattr(child, "ylist_key") and child.ylist_key is not None:
                     # ylist item
-                    if not child.yang_name in root:
-                        root[child.yang_name] = []
-                    root[child.yang_name].append(child_elem)
+                    if not child_name_with_prefix in root:
+                        root[child_name_with_prefix] = []
+                    root[child_name_with_prefix].append(child_elem)
                 else:
-                    root[child.yang_name] = child_elem
+                    root[child_name_with_prefix] = child_elem
     
     @staticmethod
-    def _create_leaf_ele(name_value, parent_json, parent_entity):
+    def _create_leaf_ele(leaf_name, leaf_data, parent_json):
         """
         creates {leaf_name: leaf_content} for a leaf and adds it to parent json object
 
         :param name_value: tuple(leaf_name, LeafData)
-        :param parent_json: json parent_entity object
-        :parent_entity: parent entity
+        :param parent_json: json for parent_entity
         """
-        leaf_name = name_value[0]
-        leaf_data = name_value[1]
         
-        if leaf_data.is_set or leaf_data.yfilter != YFilter.not_set:
-            leaf_type = "leaf"
+        if not leaf_data.is_set:
+            return
 
-            match = re.search(r'\[.="', leaf_name)
-            if match:
-                span = match.span()
-                leaf_data.value = leaf_name[span[1]:-2]
-                leaf_name = leaf_name[:span[0]]
-                leaf_type = "leaf-list"
-            
-            if leaf_data.is_set:
-                # prefix = get_leafdata_prefix(entity, leaf_name, leaf_data)
-                prefix = ""
-                content = prefix + leaf_data.value
-            elif leaf_data.yfilter != YFilter.not_set:
-                content = ""
+        leaf_type = "leaf"
 
-            if leaf_type == "leaf-list":
-                if not leaf_name in parent_json:
-                    parent_json[leaf_name] = []
-                parent_json.append(content)
-            else:
-                parent_json[leaf_name] = content
+        match = re.search(r'\[.="', leaf_name)
+        if match:
+            span = match.span()
+            leaf_data.value = leaf_name[span[1]:-2]
+            leaf_name = leaf_name[:span[0]]
+            leaf_type = "leaf-list"
+
+        # prefix = get_leafdata_prefix(entity, leaf_name, leaf_data)
+        prefix = ""
+        content = prefix + leaf_data.value
+
+        if leaf_type == "leaf-list":
+            if not leaf_name in parent_json:
+                parent_json[leaf_name] = []
+            parent_json[leaf_name].append(content)
+        else:
+            parent_json[leaf_name] = content
 
     @staticmethod
-    def prepend_config(json_obj):
-        return json_obj
+    def _format_xpath(path):
+        """
+        Removes the char "'" from xpath.
+
+        Example:
+            "openconfig-interfaces:interfaces/interface[name='1/1/c1/2']" is converted to \
+            "openconfig-interfaces:interfaces/interface[name=1/1/c1/2]"
+        """
+        return path.replace("'", "")
 
     @staticmethod
     def get_pretty(json_obj):
@@ -106,10 +161,10 @@ class JsonEncoder(object):
         """
         return json.dumps(json_obj, indent=4)
 
-    
-def _optype_is_set(optype):
+
+def _is_edit_optype(optype):
     """
-    Checks whether the operation is "set" or not
+    Checks whether the operation is edit-config or not
 
     :param optype: operation type
     """
@@ -117,4 +172,14 @@ def _optype_is_set(optype):
         return True
     return False
 
-    
+
+def _attach_yfilter(entity, optype):
+    """
+    Sets the yfilter attribute of entity when the operation type is edit
+
+    :param optype: operation type
+    """
+    original_yfilter = entity.yfilter
+    if _is_edit_optype(optype) and original_yfilter == YFilter.not_set:
+        entity.yfilter = YFilter.delete if optype == 'delete' else YFilter.update
+    return original_yfilter

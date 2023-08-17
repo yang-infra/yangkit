@@ -18,7 +18,7 @@ class Codec(object):
     @staticmethod
     def encode(entity, encoding, optype):
         """
-        Encode entity or entities to string payload(s).
+        Encode entity or entities to XML/JSON payload(s).
         :param entity: yangkit.types.Entity or list(yangkit.types.Entity)
         :param encoding: represents EncodingFormat (XML or JSON)
         :param optype: "create", "read", "update" or "delete"
@@ -44,22 +44,21 @@ class Codec(object):
             encoder = JsonEncoder
 
         if isinstance(entity, list):
-            ret_encoded_str = ""
-            for _entity in entity:
-                ret_encoded_str += encoder.encode(_entity, optype)
-
+            ret_encoded = encoder.encode_list(entity, optype)
         elif isinstance(entity, (Entity, YList)):
-            ret_encoded_str = encoder.encode(entity, optype)
-
+            ret_encoded = encoder.encode(entity, optype)
         else:
             error_msg = """Invalid 'entity' type. Expected types: yangkit.types.Entity; yangkit.types.YList; list(yangkit.types.Entity)."""
             log.error(error_msg)
             raise YInvalidArgumentError(error_msg)
 
-        if Codec._is_edit_optype(optype):
-            ret_encoded_str = encoder.prepend_config(ret_encoded_str)
+        if encoding == "XML" and Codec._is_edit_optype(optype):
+            ret_encoded = encoder.prepend_config(ret_encoded)
 
-        return encoder.get_pretty(ret_encoded_str)
+        if encoding == "XML":
+            ret_encoded = encoder.get_pretty(ret_encoded)
+        
+        return ret_encoded
 
     @staticmethod
     def decode(payload, model, encoding, is_action_response=False):
@@ -79,8 +78,8 @@ class Codec(object):
             raise YCodecError(error_msg)
 
         if not payload:
-            log.error(f"payload is empty")
-            raise YInvalidArgumentError(f"payload is empty")
+            log.error("payload is empty")
+            raise YInvalidArgumentError("payload is empty")
 
         if encoding == "XML":
             decoder = XmlDecoder
