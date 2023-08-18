@@ -76,6 +76,8 @@ class JsonDecoder:
                     for yleaf_list_item in v:
                         entity.set_value(k, yleaf_list_item)
             else:
+                if type(v) == bool:
+                    v = "true" if v else "false"
                 entity.set_value(k, v)
 
     @staticmethod

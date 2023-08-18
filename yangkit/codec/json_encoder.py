@@ -1,8 +1,9 @@
 import re
 import json
 import logging
+from yangkit.types import YList
 from yangkit.filters import YFilter
-from yangkit.utilities.entity import get_bundle_name, get_bundle_yang_ns, find_prefix_in_namespace_lookup
+from yangkit.utilities.entity import get_bundle_name, get_bundle_yang_ns, find_prefix_in_namespace_lookup, segmentalize
 
 log = logging.getLogger("yangkit")
 
@@ -19,6 +20,9 @@ class JsonEncoder(object):
         :param entity: Entity Object
         :param optype: Operation type
         """
+
+        if isinstance(entity, YList):
+            return JsonEncoder.encode_list(entity.entities(), optype)
 
         if not _is_edit_optype(optype):
             return JsonEncoder._format_xpath(entity.get_absolute_path())
@@ -44,6 +48,13 @@ class JsonEncoder(object):
         :param entity: Entity Object
         :param optype: Operation type
         """
+
+        if not _is_edit_optype(optype):
+            get_paths = []
+            for entity in entities:
+                get_paths.append(JsonEncoder._format_xpath(entity.get_absolute_path()))
+            return get_paths
+
         update_paths, delete_paths = [], []
         for entity in entities:
             update_paths_, delete_paths_ = JsonEncoder.encode(entity, optype)
@@ -149,10 +160,22 @@ class JsonEncoder(object):
         Removes the char "'" from xpath.
 
         Example:
-            "openconfig-interfaces:interfaces/interface[name='1/1/c1/2']" is converted to \
+            "openconfig-interfaces:interfaces/interface[name='1/1/c1/2'][id='None']" is converted to \
             "openconfig-interfaces:interfaces/interface[name=1/1/c1/2]"
         """
-        return path.replace("'", "")
+        segments = segmentalize(path)
+        ret_segments = []
+        for segment in segments:
+            segment_ = segment.split('[')[0]
+            keys = re.findall(r'\[(.*?)\]', segment)
+            for key in keys:
+                key_name, key_value = key.split("=")
+                if key_value != "'None'":
+                    key_value = key_value.replace("'", "")
+                    segment_ += f"[{key_name}={key_value}]"
+            ret_segments.append(segment_)
+
+        return '/'.join(ret_segments)
 
     @staticmethod
     def get_pretty(json_obj):

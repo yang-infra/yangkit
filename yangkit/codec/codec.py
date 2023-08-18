@@ -1,6 +1,6 @@
 from yangkit.utilities.logger import log
 from yangkit.types import Entity, YList
-from yangkit.errors import YInvalidArgumentError, YCodecError
+from yangkit.errors import YInvalidArgumentError
 from .xml_encoder import XmlEncoder
 from .xml_decoder import XmlDecoder
 from .json_encoder import JsonEncoder
@@ -31,12 +31,12 @@ class Codec(object):
         if encoding not in Codec.SUPPORTED_ENCODING_FORMATS:
             error_msg = f"""Invalid 'encoding' format. Supported formats: {Codec.SUPPORTED_ENCODING_FORMATS}."""
             log.error(error_msg)
-            raise YCodecError(error_msg)
+            raise YInvalidArgumentError(error_msg)
 
         if optype not in Codec.SUPPORTED_OPERATION_TYPES:
             error_msg = f"""Invalid 'operation' type. Supported types: {Codec.SUPPORTED_OPERATION_TYPES}."""
             log.error(error_msg)
-            raise YCodecError(error_msg)
+            raise YInvalidArgumentError(error_msg)
 
         if encoding == "XML":
             encoder = XmlEncoder
@@ -75,11 +75,16 @@ class Codec(object):
         if encoding not in Codec.SUPPORTED_ENCODING_FORMATS:
             error_msg = f"""Invalid 'encoding' format. Supported formats: {Codec.SUPPORTED_ENCODING_FORMATS}."""
             log.error(error_msg)
-            raise YCodecError(error_msg)
+            raise YInvalidArgumentError(error_msg)
 
         if not payload:
             log.error("payload is empty")
             raise YInvalidArgumentError("payload is empty")
+
+        if not isinstance(model, Entity):
+            error_msg = f"""'model' should be an Entity object"""
+            log.error(error_msg)
+            raise YInvalidArgumentError(error_msg)
 
         if encoding == "XML":
             decoder = XmlDecoder
