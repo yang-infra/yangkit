@@ -79,8 +79,8 @@ To Run the Script :
 - output-directory (User directory where the .tar file are gonna get generated)
 
 ```
- cd <yangkit Folder Path>
-./generate.py --bundle <Bundle Json File> --output-directory <Output Directory> -v
+ cd <yangkit Folder Path>/api_generator
+./generate.py --bundle <Abosulte Path of Bundle Json File> --output-directory <Absolute Path of Output Directory>
 ```
 
 6) Generated .tar file will be present in the output directory. This is a pip installable tar file.
