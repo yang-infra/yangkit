@@ -1,10 +1,8 @@
 ### Credits
 
-This project incorporates code from the [YDK-GEN Repository](https://github.com/CiscoDevNet/ydk-gen/tree/0.8.6.4), developed and maintained by the YDK Team.
+This project is influenced by the code from the [YDK-GEN Repository](https://github.com/CiscoDevNet/ydk-gen/tree/0.8.6.4), which was/is developed and maintained by the YDK Team.
 
 We extend our sincere appreciation to the YDK Team for their exceptional work on the YDK Project. Their dedication and expertise have significantly enriched our project.
-
-We would also like to express our gratitude to the broader community of contributors who have contributed to the YDK Repository. Their collaborative efforts have made the repository an invaluable resource for developers.
 
 Please note that the YDK Repository is governed by its own license, which you can find in their repository. We recommend reviewing their licensing terms to ensure compliance with the applicable licenses.
 
@@ -17,7 +15,7 @@ The Yangkit is a software development tool, which provides API for building appl
 ### Utilized Components
 
 1. Model API Generator : This component generates Python API Package for given Yang Models. The generated package is a PIP Installable tar file. Refer to [Steps to Generate Model API Python package](https://github.com/yang-infra/yangkit#steps-to-generate-model-api-python-package)
-2. Codec: This component translates Python API Objects to XML and vice-versa.
+2. Codec: This component translates Python API Objects to XML/json and vice-versa.
 
 <br>
 
