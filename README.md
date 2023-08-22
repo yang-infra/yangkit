@@ -33,6 +33,10 @@ pip install /auto/cafy/yang/models/7_11_1_19I/yangkit-models-cisco-ios-xr-7.11.1
 ### Steps to Generate Model API Python package
  
 1) Clone the yangkit Github
+
+```
+git clone https://github.com/yang-infra/yangkit.git
+```
  
 2) Build and source a virtual environment 
 ```
@@ -57,17 +61,15 @@ pyang *.yang
 ```
 Note: Refer [Pyang Errors Resolution](https://github.com/yang-infra/yangkit/tree/main#pyang-related-errors-resolution) if you face any pyang related issue.
 
-4) Create a bundle file: Example : /ws/jhanm-sjc/yang-kit/bundle.json
+4) Create a bundle file: 
+
+Example -
 ```
-(yangkit_venv) [jhanm@sjc-ads-1025 yang-kit]$ pwd
-/ws/jhanm-sjc/yang-kit
-(yangkit_venv) [jhanm@sjc-ads-1025 yang-kit]$ cat bundle.json 
  {
    "name": "cisco-ios-xr", <Bundle Name>
    "version": "7.11.1", <Image Version>
-   "yang_dir": "/ws/jhanm-sjc/yang-kit/yang_files" <Yang Files Directory>
+   "yang_dir": "/Users/jhanm/Documents/Yang_Folder/yang_files" <Absolute Path to Yang Files Directory>
 }
-(yangkit_venv) [jhanm@sjc-ads-1025 yang-kit]$ 
  ```
 
 5) Generate the Model API python package using below command 
@@ -94,21 +96,18 @@ removing 'yangkit-models-cisco-ios-xr-7.11.1' (and everything under it)
 Successfully created source distribution
 
 =================================================
-Successfully generated Python Yangkit cisco-ios-xr bundle package at /ws/jhanm-sjc/yang-kit/generated_models
+Successfully generated Python Yangkit cisco-ios-xr bundle package at /Users/jhanm/Documents/Yang_Folder/generated_models
 Please refer to the README for information on how to install the package in your environment
 
 Code generation completed successfully!  Manual installation required!
 
 Total time taken: 7 minutes 23 seconds
 
-(yangkit_venv) [jhanm@sjc-ads-1025 api_generator]$ 
-(yangkit_venv) [jhanm@sjc-ads-1025 generated_models]$ pwd
-/ws/jhanm-sjc/yang-kit/generated_models
-(yangkit_venv) [jhanm@sjc-ads-1025 generated_models]$ ls -lrt
-total 38804
--rw-r--r--. 1 jhanm eng      751 Jul  5 03:09 README.md
--rw-r--r--. 1 jhanm eng 39569865 Jul  6 08:43 yangkit-models-cisco-ios-xr-7.11.1.tar.gz
-(yangkit_venv) [jhanm@sjc-ads-1025 generated_models]$ 
+(yangkit_venv) bash-3.2$ 
+(yangkit_venv) bash-3.2$ pwd
+/Users/jhanm/Documents/Yang_Folder/generated_models
+(yangkit_venv) bash-3.2$ ls
+README.md  yangkit-models-cisco-ios-xr-7.11.1.tar.gz
 ```
 
 ### Pyang Related Errors Resolution
@@ -120,18 +119,18 @@ Cisco-IOS-XR-sysadmin-eobc-iosxrwbd.yang:0: error: premature end of file
 
 2) Remove oc-deviation files with pyang error.
 ```
-(yangkit_venv) [jhanm@sjc-ads-1025 PROD_BUILD_7_11_1_19I_DT_IMAGE]$ rm -rf cisco-xr-openconfig-optical-amplifier-sirius-deviations.yang
-(yangkit_venv) [jhanm@sjc-ads-1025 PROD_BUILD_7_11_1_19I_DT_IMAGE]$ rm -rf cisco-xr-openconfig-platform-deviations-spi.yang
-(yangkit_venv) [jhanm@sjc-ads-1025 PROD_BUILD_7_11_1_19I_DT_IMAGE]$ rm -rf cisco-xr-openconfig-platform-deviations-spirit.yang
-(yangkit_venv) [jhanm@sjc-ads-1025 PROD_BUILD_7_11_1_19I_DT_IMAGE]$ rm -rf cisco-xr-openconfig-terminal-device-deviations-routing.yang
-(yangkit_venv) [jhanm@sjc-ads-1025 PROD_BUILD_7_11_1_19I_DT_IMAGE]$ rm -rf cisco-xr-openconfig-platform-transceiver-deviations.yang
+rm -rf cisco-xr-openconfig-optical-amplifier-sirius-deviations.yang
+rm -rf cisco-xr-openconfig-platform-deviations-spi.yang
+rm -rf cisco-xr-openconfig-platform-deviations-spirit.yang
+rm -rf cisco-xr-openconfig-terminal-device-deviations-routing.yang
+rm -rf cisco-xr-openconfig-platform-transceiver-deviations.yang
 ```
 
 3) Fix/remove yang files with unresolved references.
 ```
 Cisco-IOS-XR-sysadmin-controllers-iosxrwbd.yang:20: error: module "Cisco-IOS-XR-sysadmin-eobc-iosxrwbd" not found in search path
 
-(yangkit_venv) [jhanm@sjc-ads-1025 PROD_BUILD_7_11_1_19I_DT_IMAGE]$ rm -rf Cisco-IOS-XR-sysadmin-controllers-iosxrwbd.yang
+rm -rf Cisco-IOS-XR-sysadmin-controllers-iosxrwbd.yang
 ```
 
 4) Fix/remove yang files with similar errors.
