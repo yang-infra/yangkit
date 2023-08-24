@@ -10,4 +10,5 @@ class YFilter(enum.Enum):
     remove = 'remove'
     delete = 'delete'
     replace = 'replace'
+    update = 'update'
     not_set = 'not_set'

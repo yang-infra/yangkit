@@ -2,7 +2,7 @@ from lxml import etree
 from yangkit.types import YList
 from yangkit.utilities.logger import log
 from yangkit.types import Entity
-from yangkit.utilities.entity import get_internal_node, get_top_level_class, get_bundle_name, get_bundle_yang_ns, path_in_namespace_lookup
+from yangkit.utilities.entity import get_internal_node, get_top_level_class, get_bundle_name, get_bundle_yang_ns, find_prefix_in_namespace_lookup
 from yangkit.errors import YCodecError
 
 
@@ -66,7 +66,9 @@ class XmlDecoder(object):
         data = payload_tree.getroottree().getroot()
 
         bundle_yang_ns = get_bundle_yang_ns(get_bundle_name(model))
-        nsmap = path_in_namespace_lookup(model.get_segment_path(), bundle_yang_ns)
+        nsp, ns = find_prefix_in_namespace_lookup(model.get_segment_path(), bundle_yang_ns)
+        nsmap = {}
+        if nsp and ns: nsmap[None] = ns
         output = etree.Element("output", nsmap=nsmap)
         output.append(data)
 
