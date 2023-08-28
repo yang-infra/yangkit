@@ -225,7 +225,7 @@ class YLeaf:
 
     def get(self):
         if self.type == YType.bits:
-            return self.get_bits_string(self.bits_value)
+            return self.bits_value.get_bits_string()
         return self.value
 
     def get_name_leafdata(self):
