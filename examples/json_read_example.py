@@ -1,6 +1,4 @@
 from yangkit.models.cisco_ios_xr import openconfig_system
-from yangkit.models.cisco_ios_xr import openconfig_system_logging
-from yangkit.models.cisco_ios_xr import openconfig_lacp
 
 from yangkit.codec import Codec
 
