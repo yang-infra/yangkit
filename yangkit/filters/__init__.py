@@ -12,3 +12,4 @@ class YFilter(enum.Enum):
     replace = 'replace'
     update = 'update'
     not_set = 'not_set'
+    read = 'read'
