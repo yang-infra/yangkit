@@ -34,8 +34,6 @@ class PyangModelBuilder(object):
 
         filenames = self._get_yang_file_names()
         modules = self._get_pyang_modules(filenames)
-        # modules, files_to_ignore = self._get_pyang_modules(filenames)
-        # result = [x for x in filenames if x not in files_to_ignore]
         self._validate_pyang_modules(filenames)
 
         self.submodules = [m for m in modules if m.keyword == 'submodule']
