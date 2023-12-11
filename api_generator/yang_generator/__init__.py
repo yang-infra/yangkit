@@ -42,7 +42,7 @@ class YangkitGenerator(object):
             YangkitGenException: If an error has occurred
     """
 
-    def __init__(self, output_dir, yangkit_root, package_type):
+    def __init__(self, output_dir, yangkit_root, package_type, ignore_pyang_errors=False):
 
         _check_generator_args(output_dir, yangkit_root, package_type)
 
@@ -53,6 +53,7 @@ class YangkitGenerator(object):
         self.package_name = ""
         self.version = ""
         self.generate_meta = False
+        self.ignore_pyang_errors = ignore_pyang_errors
 
     def generate(self, description_file):
         """ Generate yangkit bundle packages or yangkit core library.
@@ -129,7 +130,7 @@ class YangkitGenerator(object):
         """
 
         resolved_model_dir = bundle.resolved_models_dir
-        pyang_builder = PyangModelBuilder(resolved_model_dir)
+        pyang_builder = PyangModelBuilder(resolved_model_dir, self.ignore_pyang_errors)
         modules = pyang_builder.parse_and_return_modules()
 
         # build api model packages

@@ -13,11 +13,12 @@ logger.addHandler(logging.NullHandler())
 
 
 class PyangModelBuilder(object):
-    def __init__(self, resolved_model_dir):
+    def __init__(self, resolved_model_dir, ignore_pyang_errors=False):
         self.repos = _repository.FileRepository(resolved_model_dir, False)
         self.ctx = _context.Context(self.repos)
         self.resolved_model_dir = resolved_model_dir
         self.submodules = []
+        self.ignore_pyang_errors = ignore_pyang_errors
 
     def parse_and_return_modules(self):
         """ Use pyang to parse the files, validate them and get a list of modules.
@@ -33,6 +34,8 @@ class PyangModelBuilder(object):
 
         filenames = self._get_yang_file_names()
         modules = self._get_pyang_modules(filenames)
+        # modules, files_to_ignore = self._get_pyang_modules(filenames)
+        # result = [x for x in filenames if x not in files_to_ignore]
         self._validate_pyang_modules(filenames)
 
         self.submodules = [m for m in modules if m.keyword == 'submodule']
@@ -202,7 +205,10 @@ class PyangModelBuilder(object):
             else:
                 module = self.ctx.add_module(filename, text)
             if module is None:
-                raise YangkitGenException('\nCould not add module "%s", (%s). \nPlease remove any duplicate files and verify that all the models pass pyang. Run "pyang *" on all the models.'%(name, filename))
+                if not self.ignore_pyang_errors:
+                    raise YangkitGenException('\nCould not add module "%s", (%s). \nPlease remove any duplicate files and verify that all the models pass pyang. Run "pyang *" on all the models.'%(name, filename))
+                logger.warning(f"Ignoring this model file : {filename}.")
+                logger.warning('\nCould not add module "%s", (%s). \nPlease remove any duplicate files and verify that all the models pass pyang. Run "pyang *" on all the models.'%(name, filename))     
             else:
                 modules.append(module)
         return modules
@@ -236,4 +242,6 @@ class PyangModelBuilder(object):
 
         if len(error_messages) > 0:
             err_msg = '\n'.join(error_messages)
-            raise YangkitGenException('''\nError occured: "%s". \nThe models supplied to the yangkit generator are invalid. Please make sure the models are valid by compiling the models together using pyang. Please run "pyang *.yang" in the models directory, make sure there are no errors and then try running the generator again. If there are model errors, please fix the errors by editing the model, contacting the model owner or deleting the model from the list of models to generate the yangkit bindings for.''' % err_msg)
+            if not self.ignore_pyang_errors:
+                raise YangkitGenException('''\nError occured: "%s". \nThe models supplied to the yangkit generator are invalid. Please make sure the models are valid by compiling the models together using pyang. Please run "pyang *.yang" in the models directory, make sure there are no errors and then try running the generator again. If there are model errors, please fix the errors by editing the model, contacting the model owner or deleting the model from the list of models to generate the yangkit bindings for.''' % err_msg)
+            logger.warning('''\nError occured: "%s". \nThe models supplied to the yangkit generator are invalid. Please make sure the models are valid by compiling the models together using pyang. Please run "pyang *.yang" in the models directory, make sure there are no errors and then try running the generator again. If there are model errors, please fix the errors by editing the model, contacting the model owner or deleting the model from the list of models to generate the yangkit bindings for.''' % err_msg)

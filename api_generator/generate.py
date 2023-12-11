@@ -88,6 +88,12 @@ if __name__ == '__main__':
         default=False,
         help="Verbose mode")
 
+    parser.add_argument(
+        "-i", "--ignore_pyang_errors",
+        action="store_true",
+        default=False,
+        help="Ignore Pyang Validation Errors")
+
     options = parser.parse_args()
 
     if options.verbose:
@@ -95,13 +101,15 @@ if __name__ == '__main__':
 
     yangkit_root = os.getcwd()
     output_directory = options.output_directory
+    ignore_pyang_errors = options.ignore_pyang_errors
 
     try:
         if options.bundle:
             generator = YangkitGenerator(
                 output_directory,
                 yangkit_root,
-                'bundle')
+                'bundle',
+                ignore_pyang_errors)
 
             output_directory = (generator.generate(options.bundle))
     except YangkitGenException as e:
