@@ -2,7 +2,7 @@
 
 This project is influenced by the code from the [YDK-GEN Repository](https://github.com/CiscoDevNet/ydk-gen/tree/0.8.6.4), which was/is developed and maintained by the YDK Team.
 
-We extend our sincere appreciation to the YDK Team for their exceptional work on the YDK Project. Their dedication and expertise have significantly enriched our project.
+We extend our sincere appreciation to the YDK Team for their exceptional work on the YDK Project. 
 
 Please note that the YDK Repository is governed by its own license, which you can find in their repository. We recommend reviewing their licensing terms to ensure compliance with the applicable licenses.
 

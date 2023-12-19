@@ -1,3 +1,4 @@
+import re
 import uuid
 from lxml import etree
 from yangkit.utilities.logger import log
@@ -204,6 +205,15 @@ class XmlEncoder(object):
             nsmap['idx'] = leaf_data.name_space
             if leaf_data.is_set and leaf_data.value.startswith(leaf_data.name_space_prefix):
                 leaf_data.value = leaf_data.value.replace(leaf_data.name_space_prefix, 'idx')
+
+        # Needed only for leaf-list types because get_name_leafdata for YLeafList provides
+        # data in format {leaf_name_data[0]}[.="{val}"]'. ex: 'packagename[.="xr-rsvp-te"]'
+        if leaf_data.is_set:
+            match = re.search(r'\[.="', leaf_name)
+            if match:
+                span = match.span()
+                leaf_data.value = leaf_name[span[1]:-2]
+                leaf_name = leaf_name[:span[0]]
 
         leaf_ele = etree.Element(leaf_name, nsmap=nsmap)
         if leaf_data.is_set:
