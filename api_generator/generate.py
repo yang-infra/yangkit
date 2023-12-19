@@ -111,7 +111,7 @@ if __name__ == '__main__':
                 'bundle',
                 ignore_pyang_errors)
 
-            output_directory = (generator.generate(options.bundle))
+            output_directory, pyang_errors_list = (generator.generate(options.bundle))
     except YangkitGenException as e:
         print('\nError(s) occurred in YangkitGenerator()!\n')
         print(e.msg)
@@ -132,3 +132,12 @@ if __name__ == '__main__':
 
     minutes_str, seconds_str = _get_time_taken(start_time)
     print('\nTotal time taken: {0} {1}\n'.format(minutes_str, seconds_str))
+
+    if ignore_pyang_errors and len(pyang_errors_list) > 0:
+        for error_line in pyang_errors_list:
+            logger.warning(error_line)
+
+
+
+
+
