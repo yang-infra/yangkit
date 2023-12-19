@@ -135,4 +135,4 @@ if __name__ == '__main__':
 
     if ignore_pyang_errors and len(pyang_errors_list) > 0:
         for error_line in pyang_errors_list:
-            logger.warning(error_line)
+            print(error_line)
