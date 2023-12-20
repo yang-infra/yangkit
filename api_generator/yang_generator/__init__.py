@@ -42,7 +42,7 @@ class YangkitGenerator(object):
             YangkitGenException: If an error has occurred
     """
 
-    def __init__(self, output_dir, yangkit_root, package_type):
+    def __init__(self, output_dir, yangkit_root, package_type, ignore_pyang_errors=False):
 
         _check_generator_args(output_dir, yangkit_root, package_type)
 
@@ -53,6 +53,8 @@ class YangkitGenerator(object):
         self.package_name = ""
         self.version = ""
         self.generate_meta = False
+        self.ignore_pyang_errors = ignore_pyang_errors
+        self.pyang_errors_list = []
 
     def generate(self, description_file):
         """ Generate yangkit bundle packages or yangkit core library.
@@ -65,7 +67,7 @@ class YangkitGenerator(object):
             List of Generated APIs root directories for bundle packages.
         """
         if self.package_type == 'bundle':
-            return self._generate_bundle(description_file)
+            return self._generate_bundle(description_file), self.pyang_errors_list
         else:
             raise YangkitGenException('Invalid package type specified: %s' % self.package_type)
 
@@ -129,9 +131,9 @@ class YangkitGenerator(object):
         """
 
         resolved_model_dir = bundle.resolved_models_dir
-        pyang_builder = PyangModelBuilder(resolved_model_dir)
-        modules = pyang_builder.parse_and_return_modules()
-
+        pyang_builder = PyangModelBuilder(resolved_model_dir, self.ignore_pyang_errors)
+        modules, pyang_errors_list = pyang_builder.parse_and_return_modules()
+        self.pyang_errors_list = pyang_errors_list
         # build api model packages
         packages = ApiModelBuilder(self.iskeyword, bundle.name).generate(modules)
         packages.extend(
