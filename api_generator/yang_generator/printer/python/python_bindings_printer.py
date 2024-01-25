@@ -5,6 +5,7 @@
 import os
 import shutil
 from distutils import dir_util
+from concurrent.futures import ThreadPoolExecutor
 
 from yang_generator.api_model import Bits, Class, Enum, Package, get_property_name
 from yang_generator.common import get_rst_file_name
@@ -48,8 +49,9 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
         only_modules = [package.stmt for package in self.packages]
         size = len(only_modules)
 
-        for index, package in enumerate(self.packages):
-            self._print_module(index, package, size)
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            for index, package in enumerate(self.packages):
+                job = executor.submit(lambda p : self._print_module(*p), [index, package, size])
 
     def _print_module(self, index, package, size):
         print('Processing %d of %d %s' % (index + 1, size, package.stmt.pos.ref))
