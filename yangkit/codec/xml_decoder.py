@@ -89,53 +89,57 @@ class XmlDecoder(object):
         :param root: root of the element tree
         :param entity: Enitity object
         """
-        print("Root")
+        print("Root -> ")
         print(root)
-        print("Entity")
+        print("Entity -> ")
         print(entity)
         if root is None:
             return
 
         qual_root = etree.QName(root)
-        print("Qual Root")
+        print("Qual Root -> ")
         print(qual_root)
         root_namespace = qual_root.namespace
-        print("Root Namespace")
+        print("Root Namespace -> ")
         print(root_namespace)
         bundle_yang_ns = get_bundle_yang_ns(get_bundle_name(entity))
-        print("Bundle Yang NS")
+        print("Bundle Yang NS -> ")
         print(bundle_yang_ns)
 
         for child_node in root.getchildren():
             # separate element namespace and tag
-            print("Child Node")
+            print("Child Node -> ")
             print(child_node)
             qual_node = etree.QName(child_node)
-            print("Child Qual Node")
+            print("Child Qual Node ->")
             print(qual_node)
             namespace, yname = qual_node.namespace, qual_node.localname
-            print("namespace")
+            print("namespace -> ")
             print(namespace)
-            print("yname")
+            print("yname -> ")
             print(yname)
 
             if namespace != root_namespace:
-                print("namespace")
+                print("namespace -> ")
                 print(namespace)
-                print("root_namespace")
+                print("root_namespace -> ")
                 print(root_namespace)
                 for name_space_prefix, name_space in bundle_yang_ns.NAMESPACE_LOOKUP.items():
                     if name_space == namespace:
                         yname = f"{name_space_prefix}:{yname}"
                         break
             
-            print("CN Text")
+            print("CN Text -> ")
             print(child_node.text)
             entity.set_value(yname, child_node.text)
-            print("entity")
-            prrint(entity)
+            print("entity -> ")
+            print(entity)
 
             attr, child = entity.get_child_by_name(yname, "")
+            print("attr -> ")
+            print(attr)
+            print("child -> ")
+            print(child)
             if attr and child:
                 if isinstance(getattr(entity, attr), YList):
                     XmlDecoder._decode_helper(child_node, child)
