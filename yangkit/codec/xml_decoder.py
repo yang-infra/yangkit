@@ -138,8 +138,6 @@ class XmlDecoder(object):
     
             
             
-            import pdb
-            pdb.set_trace()
             print("CN Text -> ")
             print(child_node.text)
             entity.set_value(yname, child_node.text)
