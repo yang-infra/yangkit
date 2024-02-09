@@ -125,7 +125,7 @@ class XmlDecoder(object):
             print(namespace)
             print("yname -> ")
             print(yname)
-
+            """
             if namespace != root_namespace:
                 print("namespace -> ")
                 print(namespace)
@@ -135,6 +135,7 @@ class XmlDecoder(object):
                     if name_space == namespace:
                         yname = f"{name_space_prefix}:{yname}"
                         break
+            """
             
             
             import pdb
