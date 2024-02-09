@@ -126,7 +126,7 @@ class XmlDecoder(object):
             print("yname -> ")
             print(yname)
 
-            if namespace != root_namespace:
+            if root_namespace and namespace != root_namespace:
                 print("namespace -> ")
                 print(namespace)
                 print("root_namespace -> ")
