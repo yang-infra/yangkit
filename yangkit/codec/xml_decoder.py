@@ -72,6 +72,10 @@ class XmlDecoder(object):
         output = etree.Element("output", nsmap=nsmap)
         output.append(data)
 
+        print("Output -->")
+        print(output)
+        print("Model Output -->")
+        print(model.output)
         try:
             XmlDecoder._decode_helper(output, model.output)
         except Exception as error:
@@ -79,6 +83,9 @@ class XmlDecoder(object):
             log.error(error)
             raise YCodecError(error)
 
+        print("Model Output -->")
+        print(model.output)
+        print(model.__dict__)
         return model
 
     @staticmethod
@@ -134,6 +141,7 @@ class XmlDecoder(object):
             entity.set_value(yname, child_node.text)
             print("entity -> ")
             print(entity)
+            print(entity.__dict__)
 
             attr, child = entity.get_child_by_name(yname, "")
             print("attr -> ")
