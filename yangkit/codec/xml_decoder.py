@@ -101,7 +101,7 @@ class XmlDecoder(object):
             qual_node = etree.QName(child_node)
             namespace, yname = qual_node.namespace, qual_node.localname
 
-            if namespace != root_namespace:
+            if root_namespace and namespace != root_namespace:
                 for name_space_prefix, name_space in bundle_yang_ns.NAMESPACE_LOOKUP.items():
                     if name_space == namespace:
                         yname = f"{name_space_prefix}:{yname}"
