@@ -155,12 +155,17 @@ class XmlDecoder(object):
             print(attr)
             print("child -> ")
             print(child)
+            print("entity after get child by name")
+            print(entity.__dict__)
             if attr and child:
                 if isinstance(getattr(entity, attr), YList):
                     XmlDecoder._decode_helper(child_node, child)
                     getattr(entity, attr).append(child)
                 elif isinstance(child, Entity):
                     XmlDecoder._decode_helper(child_node, child)
+            print("entity at the end of decode")
+            print(entity.__dict__)
+
 
     @staticmethod
     def data_in_rpc_reply(rpc_reply_xml):
