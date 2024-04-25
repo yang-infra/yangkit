@@ -18,18 +18,29 @@ def get_internal_node(entity, absolute_path):
     :param entity: entity object
     :param absolute_path: absolute path
     """
+    print("absolute_path")
+    print(absolute_path)
+    print("entity")
+    print(entity.__dict__)
     if not absolute_path:
         err_msg = f"Argument 'absolute_path' should not be empty or None"
         log.error(err_msg)
         raise YInvalidArgumentError(err_msg)
 
     top_absolute_path = entity.get_absolute_path()
+    print("top_absolute_path")
+    print(top_absolute_path)
+    
     if not top_absolute_path:
         err_msg = f"absolute_path of {entity} should not be empty or None"
         log.error(err_msg)
         raise YInvalidArgumentError(err_msg)
 
     segments = segmentalize(absolute_path)
+    print("segemnts")
+    print(segments)
+    print("segments 0 index")
+    print(segments[0])
 
     if segments[0] != top_absolute_path:
         err_msg = f"{top_absolute_path} is not in the ancestor hierarchy of {absolute_path}"
@@ -38,24 +49,48 @@ def get_internal_node(entity, absolute_path):
 
     for segment in segments[1:]:
         if '[' in segment:
+            print("segment")
+            print(segment)
             attr, child = entity.get_child_by_name(segment.split('[')[0], "")
+            print("attr")
+            print(attr)
+            print("child")
+            print(child)
+            
             ylist = getattr(entity, attr)
+            print("ylist")
+            print(ylist)
 
             found = False
             for ylist_item in ylist:
                 if ylist_item.ylist_key_names and ylist_item.get_segment_path() == segment:
                     found = True
                     break
+            print("found")
+            print(found)
+            
             if found:
                 entity = ylist_item
+                print("entity - found true")
+                print(entity)
             elif segment == segments[-1]:
                 # fair assumption
+                print("ylist.entities()")
+                print(ylist.entities())
                 return ylist.entities()
             else:
                 entity = child
+                print("entity - found false")
+                print(entity)
         else:
+            print("segment else block")
+            print(segment)
             _, entity = entity.get_child_by_name(segment, segment)
+            print("entity else block")
+            print(entity)
 
+    print("entity")
+    print(entity.__dict__)
     return entity
 
 
