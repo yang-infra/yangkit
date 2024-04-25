@@ -35,13 +35,18 @@ class XmlDecoder(object):
                 raise YCodecError(error)
         else:
             log.debug("payload is empty")
-
+        print("TOP Entity Before")
+        print(top_entity.__dict__)
         # fetching internal node from top_entity with path equivalent to model's absolute_path
         if not isinstance(model, Entity):
             log.error("Argument 'model' should be an Entity object")
             raise YCodecError("Argument 'model' should be an Entity object")
         else:
+            print("Model Absolute Path")
+            print(model.get_absolute_path())
             internal_node = get_internal_node(top_entity, model.get_absolute_path())
+            print("TOP Entity After")
+            print(internal_node.__dict__)
 
         return internal_node
 
