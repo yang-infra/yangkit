@@ -46,7 +46,7 @@ class XmlDecoder(object):
             print(model.get_absolute_path())
             internal_node = get_internal_node(top_entity, model.get_absolute_path())
             print("TOP Entity After")
-            print(internal_node.__dict__)
+            print(internal_node)
 
         return internal_node
 
