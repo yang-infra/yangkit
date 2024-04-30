@@ -18,6 +18,7 @@ def get_internal_node(entity, absolute_path):
     :param entity: entity object
     :param absolute_path: absolute path
     """
+    import pdb; pdb.set_trace()
     print("absolute_path")
     print(absolute_path)
     print("entity")
