@@ -11,3 +11,4 @@ venv
 *.egg
 .cache
 .idea/
+build/
