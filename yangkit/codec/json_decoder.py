@@ -69,6 +69,7 @@ class JsonDecoder:
                 if attr and child:
                     # ylist
                     for ylist_item in v:
+                        attr, child = entity.get_child_by_name(k, k)
                         JsonDecoder._decode_json(ylist_item, child)
                         getattr(entity, attr).append(child)
                 else:
