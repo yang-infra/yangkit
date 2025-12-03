@@ -505,7 +505,10 @@ class Entity:
 
         for seg in [child_yang_name, segment_path]:
             for name in self._children_name_map:
-                if seg in self._children_name_map[name]:
+                #below if condition is added to handle both ydk and openconfig. 
+                #where incase of openconfig if segment_path has ":" (e.g - Cisco-IOS-XR-openconfig-npu-resources-oper-ext:cisco")
+                #"cisco" will be considered to fetch the class name
+                if seg.split(":")[-1] == self._children_name_map[name]:
                     if self.__dict__[name]:
                         return name, self.__dict__[name]
 
