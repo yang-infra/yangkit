@@ -505,7 +505,7 @@ class Entity:
 
         for seg in [child_yang_name, segment_path]:
             for name in self._children_name_map:
-                if seg in self._children_name_map[name]:
+                if seg.split(":")[-1] == self._children_name_map[name]:
                     if self.__dict__[name]:
                         return name, self.__dict__[name]
 
