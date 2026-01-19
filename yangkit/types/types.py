@@ -508,7 +508,7 @@ class Entity:
                 #below if condition is added to handle both ydk and openconfig. 
                 #where incase of openconfig if segment_path has ":" (e.g - Cisco-IOS-XR-openconfig-npu-resources-oper-ext:cisco")
                 #"cisco" will be considered to fetch the class name
-                if seg.split(":")[-1] == self._children_name_map[name]:
+                if seg.split(":")[-1] == self._children_name_map[name].split(":")[-1]:
                     if self.__dict__[name]:
                         return name, self.__dict__[name]
 
