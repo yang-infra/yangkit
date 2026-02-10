@@ -32,7 +32,6 @@ setup(
     author='Cafy',
     author_email='cafy-support@cisco.com',
     packages=YANGKIT_PACKAGES,
-    namespace_packages=NMSP_PACKAGES,
     install_requires=INSTALL_REQUIREMENTS,
     include_package_data=True
 )
