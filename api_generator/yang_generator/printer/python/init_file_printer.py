@@ -13,6 +13,5 @@ class InitPrinter(object):
 
     def print_nmsp_declare_init(self, _):
         """Print init file to declare namespace package."""
-        self.ctx.str("""import pkg_resources
-pkg_resources.declare_namespace(__name__)
-""")
+        self.ctx.str("""__path__ = __import__('pkgutil').extend_path(__path__, __name__)""")
+
